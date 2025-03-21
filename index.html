@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gait Analysis - Patient Data</title>
+    <script type="module" src="app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #captureHeightBtn {
+            background-color: #28a745;
+        }
+        #captureHeightBtn:hover {
+            background-color: #218838;
+        }
+        #stopKinectBtn {
+            background-color: #dc3545;
+        }
+        #stopKinectBtn:hover {
+            background-color: #c82333;
+        }
+        #startSkeletalCaptureBtn {
+            background-color: #ff9800;
+        }
+        #startSkeletalCaptureBtn:hover {
+            background-color: #e68900;
+        }
+        #submitBtn {
+            background-color: #007bff;
+        }
+        #submitBtn:disabled, #startSkeletalCaptureBtn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            background: white;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Patient Registration</h2>
+    <form id="patientForm">
+        <label for="name">Name</label>
+        <input type="text" id="name" placeholder="Enter Name" required autofocus>
+
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="Enter Age" required min="1">
+
+        <label for="gender">Gender</label>
+        <select id="gender" required>
+            <option value="" disabled selected>Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select>
+
+        <label for="height">Height (cm)</label>
+        <input type="text" id="height" placeholder="Auto-filled by Kinect" readonly>
+
+        <button type="button" id="captureHeightBtn">Start Height Capturing</button>
+        <button type="button" id="stopKinectBtn">Stop Kinect</button>
+        <button type="submit" id="submitBtn" disabled>Add Patient</button>
+        <button type="button" id="startSkeletalCaptureBtn" disabled>Go to Skeletal Capture</button>
+    </form>
+
+    <h3>Patient List</h3>
+    <ul id="patientList"></ul>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const nameInput = document.getElementById("name");
+            const ageInput = document.getElementById("age");
+            const genderInput = document.getElementById("gender");
+            const heightInput = document.getElementById("height");
+            const submitBtn = document.getElementById("submitBtn");
+            const startSkeletalCaptureBtn = document.getElementById("startSkeletalCaptureBtn");
+
+            function validateForm() {
+                if (nameInput.value.trim() && ageInput.value.trim() && genderInput.value && heightInput.value) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
+            nameInput.addEventListener("input", validateForm);
+            ageInput.addEventListener("input", validateForm);
+            genderInput.addEventListener("change", validateForm);
+            heightInput.addEventListener("input", validateForm);
+
+            document.getElementById("patientForm").addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                const patientData = {
+                    name: nameInput.value.trim(),
+                    age: ageInput.value.trim(),
+                    gender: genderInput.value,
+                    height: heightInput.value
+                };
+
+                localStorage.setItem("patientData", JSON.stringify(patientData));
+                alert(✅ Patient ${patientData.name} added successfully!);
+
+                startSkeletalCaptureBtn.disabled = false;
+
+                nameInput.value = "";
+                ageInput.value = "";
+                genderInput.value = "";
+                heightInput.value = "";
+
+                validateForm();
+            });
+
+            startSkeletalCaptureBtn.addEventListener("click", () => {
+                window.location.href = "skeletal.html";
+            });
+        });
+    </script>
+</body>
+</html>
