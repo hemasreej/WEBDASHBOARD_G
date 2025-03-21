@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skeletal Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+        }
+        #patientInfo {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #startSkeletalCaptureBtn {
+            background-color: #ff9800;
+        }
+        #startSkeletalCaptureBtn:hover {
+            background-color: #e68900;
+        }
+        #stopSkeletalCaptureBtn {
+            background-color: #dc3545;
+        }
+        #stopSkeletalCaptureBtn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <h2>Patient Information</h2>
+    <div id="patientInfo">
+        <p><strong>Name:</strong> <span id="patientName"></span></p>
+        <p><strong>Age:</strong> <span id="patientAge"></span></p>
+        <p><strong>Gender:</strong> <span id="patientGender"></span></p>
+        <p><strong>Height:</strong> <span id="patientHeight"></span> cm</p>
+    </div>
+
+    <button id="startSkeletalCaptureBtn">Start Skeletal Capture</button>
+    <button id="stopSkeletalCaptureBtn" disabled>Stop Skeletal Capture</button>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const patientData = JSON.parse(localStorage.getItem("patientData"));
+        if (!patientData) {
+            alert("No patient data found! Redirecting...");
+            window.location.href = "index.html";
+            return;
+        }
+
+        document.getElementById("patientName").textContent = patientData.name;
+        document.getElementById("patientAge").textContent = patientData.age;
+        document.getElementById("patientGender").textContent = patientData.gender;
+        document.getElementById("patientHeight").textContent = patientData.height;
+
+        const startButton = document.getElementById("startSkeletalCaptureBtn");
+        const stopButton = document.getElementById("stopSkeletalCaptureBtn");
+
+        startButton.addEventListener("click", async () => {
+            try {
+                let response = await fetch("http://localhost:5000/startSkeletalTracking");
+                if (!response.ok) throw new Error("Failed to start skeletal tracking");
+                alert("🏃 Skeletal tracking started!");
+                startButton.disabled = true;
+                stopButton.disabled = false;
+            } catch (error) {
+                console.error("❌ Skeletal Capture Error:", error);
+                alert("❌ Failed to start skeletal tracking.");
+            }
+        });
+
+        stopButton.addEventListener("click", async () => {
+            try {
+                let response = await fetch("http://localhost:5000/stopSkeletalTracking");
+                if (!response.ok) throw new Error("Failed to stop skeletal tracking");
+                alert("⛔ Skeletal tracking stopped!");
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            } catch (error) {
+                console.error("❌ Stop Skeletal Capture Error:", error);
+                alert("❌ Failed to stop skeletal tracking.");
+            }
+        });
+    });
+    </script>
+</body>
+</html>
